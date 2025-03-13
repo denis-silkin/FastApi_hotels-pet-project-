@@ -49,7 +49,7 @@ async def me(
     return user
 
 
-@router.post("/logout/")
+@router.post("/logout")
 async def logout_user(response: Response):
     response.delete_cookie(key="access_token")
     return {"status": "ok"}
