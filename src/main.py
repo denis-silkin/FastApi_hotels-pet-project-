@@ -1,13 +1,16 @@
-from fastapi import FastAPI, Query, Body
+from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 import uvicorn
 
 import sys
 from pathlib import Path
 
-from src.api.hotels import router as router_hotels
-from src.api.auth import router as router_auth
-from src.api.rooms import router as router_rooms
+from api.hotels import router as router_hotels
+from api.auth import router as router_auth
+from api.rooms import router as router_rooms
+from api.facilities import router as router_facilities
+from api.bookings import router as router_bookings
+
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -20,6 +23,8 @@ app = FastAPI(docs_url=None)
 app.include_router(router_auth)
 app.include_router(router_hotels)
 app.include_router(router_rooms)
+app.include_router(router_facilities)
+app.include_router(router_bookings)
 
 
 @app.get("/docs", include_in_schema=False)

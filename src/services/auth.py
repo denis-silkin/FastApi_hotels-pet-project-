@@ -4,7 +4,7 @@ from datetime import datetime, timezone, timedelta
 from passlib.context import CryptContext
 import jwt
 
-from src.config import settings
+from config import settings
 
 
 class AuthService:
