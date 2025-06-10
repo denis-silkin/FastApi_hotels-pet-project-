@@ -3,10 +3,10 @@ import typing
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from database import Base
+from src.database import Base
 
 if typing.TYPE_CHECKING:
-    from models import RoomsOrm
+    from src.models import RoomsOrm
 
 
 class FacilitiesOrm(Base):
@@ -23,6 +23,7 @@ class FacilitiesOrm(Base):
 
 class RoomsFacilitiesOrm(Base):
     __tablename__ = "rooms_facilities"
+    __table_args__ = {'extend_existing': True}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     room_id: Mapped[int] = mapped_column(ForeignKey("rooms.id"))

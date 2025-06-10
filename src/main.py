@@ -1,30 +1,53 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
 import uvicorn
 
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+
 import sys
 from pathlib import Path
 
-from api.hotels import router as router_hotels
-from api.auth import router as router_auth
-from api.rooms import router as router_rooms
-from api.facilities import router as router_facilities
-from api.bookings import router as router_bookings
-
+from config import settings
 
 sys.path.append(str(Path(__file__).parent.parent))
+
+
+from src.init import redis_manager
+from src.api.hotels import router as router_hotels
+from src.api.auth import router as router_auth
+from src.api.rooms import router as router_rooms
+from src.api.facilities import router as router_facilities
+from src.api.bookings import router as router_bookings
+from src.api.images import router as router_images
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    #  При старте приложения
+    await redis_manager.connect()
+    FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
+    yield
+    await redis_manager.close()
+    #  При выключении\перезагрузке приложения
+
+if settings.MODE == "TEST":
+    FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
 
 # from src.config import settings
 # print(f'{settings.DB_URL=}')
 # print(f'{settings.DB_NAME=}')
 
-app = FastAPI(docs_url=None)
+app = FastAPI(docs_url=None, lifespan=lifespan)
 
 app.include_router(router_auth)
 app.include_router(router_hotels)
 app.include_router(router_rooms)
 app.include_router(router_facilities)
 app.include_router(router_bookings)
+app.include_router(router_images)
 
 
 @app.get("/docs", include_in_schema=False)

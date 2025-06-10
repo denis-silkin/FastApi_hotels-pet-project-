@@ -1,25 +1,28 @@
 from datetime import date
 
 from fastapi import APIRouter, Body, Query
+from fastapi_cache.decorator import cache
 
-from api.dependencies import DBDep
-from schemas.facilities import RoomFacilityAdd
-from schemas.rooms import RoomAdd, RoomPatchRequest, RoomPatch, RoomAddRequest
+from src.api.dependencies import DBDep
+from src.schemas.facilities import RoomFacilityAdd
+from src.schemas.rooms import RoomAdd, RoomPatchRequest, RoomPatch, RoomAddRequest
 
 router = APIRouter(prefix='/hotels', tags=['Номера'])
 
 
 @router.get("{hotel_id}/rooms")
+@cache(expire=10)
 async def get_rooms(
         hotel_id: int,
         db: DBDep,
-        date_from: date = Query(example="2025-08-01"),
-        date_to: date = Query(example="2025-08-10"),
+        date_from: date = Query(examples=["2025-08-01"]),
+        date_to: date = Query(examples=["2025-08-10"]),
 ):
     return await db.rooms.get_filtered_by_time(hotel_id=hotel_id, date_from=date_from, date_to=date_to)
 
 
 @router.get("/{hotel_id}/rooms/{room_id}", summary="получение одного номера")
+@cache(expire=10)
 async def get_room(hotel_id: int, room_id: int, db: DBDep):
     return await db.rooms.get_one_or_none_with_rels(hotel_id=hotel_id, id=room_id)
 

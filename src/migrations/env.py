@@ -7,11 +7,7 @@ from alembic import context
 
 from config import settings
 from database import Base
-from models.hotels import HotelsOrm
-from models.rooms import RoomsOrm
-from models.users import UsersOrm
-from models.bookings import BookingsOrm
-from models.facilities import FacilitiesOrm
+from src.models import *  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

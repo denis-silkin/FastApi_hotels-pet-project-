@@ -4,9 +4,9 @@ from fastapi import Request, HTTPException
 from fastapi import Query, Depends
 from pydantic import BaseModel
 
-from database import async_session_maker
-from services.auth import AuthService
-from utils.db_manager import DBManager
+from src.database import async_session_maker
+from src.services.auth import AuthService
+from src.utils.db_manager import DBManager
 
 
 class PaginationParams(BaseModel):

@@ -1,21 +1,24 @@
 from datetime import date
 
 from fastapi import Query, APIRouter, Body
+from fastapi_cache.decorator import cache
 
-from schemas.hotels import Hotel, HotelPATCH
-from api.dependencies import PaginationDep, DBDep
+
+from src.schemas.hotels import Hotel, HotelPATCH
+from src.api.dependencies import PaginationDep, DBDep
 
 router = APIRouter(prefix='/hotels', tags=['Отели'])
 
 
 @router.get('')
+@cache(expire=10)
 async def get_hotels(
         pagination: PaginationDep,
         db: DBDep,
         location: str | None = Query(None, description='Локация'),
         title: str | None = Query(None, description='Название отеля'),
-        date_from: date = Query(example="2025-08-01"),
-        date_to: date = Query(example="2025-08-10"),
+        date_from: date = Query(examples=["2025-08-01"]),
+        date_to: date = Query(examples=["2025-08-10"]),
 ):
     page_size = pagination.page_size or 5
     return await db.hotels.get_filtered_by_time(
@@ -29,6 +32,7 @@ async def get_hotels(
 
 
 @router.get('/{hotel_id}', summary="получение одного отеля")
+@cache(expire=10)
 async def get_hotels_one(hotel_id: int, db: DBDep):
     return await db.hotels.get_one_or_none(id=hotel_id)
 
