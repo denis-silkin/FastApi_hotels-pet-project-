@@ -51,6 +51,8 @@ async def get_db_null_pool():
 async def db() -> DBManager:
     async with DBManager(session_factory=async_session_maker_null_pool) as db:
         yield db
+
+
 # можно так еще проходить по генератору
 # async for db in get_db_null_pool():
 #   yield db
@@ -65,10 +67,10 @@ async def setup_database(check_test_mode):
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
-    with open('tests/mock_hotels.json', encoding="utf-8") as f_h:
-            hotels = json.load(f_h)
-    with open('tests/mock_rooms.json', encoding="utf-8") as f_r:
-            rooms = json.load(f_r)
+    with open("tests/mock_hotels.json", encoding="utf-8") as f_h:
+        hotels = json.load(f_h)
+    with open("tests/mock_rooms.json", encoding="utf-8") as f_r:
+        rooms = json.load(f_r)
 
     hotels = [HotelAdd.model_validate(hotel) for hotel in hotels]
     rooms = [RoomAdd.model_validate(room) for room in rooms]
@@ -92,7 +94,7 @@ async def register_user(ac, setup_database):
         json={
             "email": "kot@pes.com",
             "password": "1234",
-        }
+        },
     )
 
 
@@ -103,7 +105,7 @@ async def authenticated_ac(register_user, ac):
         json={
             "email": "kot@pes.com",
             "password": "1234",
-        }
+        },
     )
     assert ac.cookies["access_token"]
     yield ac

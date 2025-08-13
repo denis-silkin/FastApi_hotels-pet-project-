@@ -1,18 +1,19 @@
 from contextlib import asynccontextmanager
+import logging
+import sys
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.openapi.docs import get_swagger_ui_html
-import uvicorn
-
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
-
-import sys
-from pathlib import Path
+import uvicorn
 
 from config import settings
 
 sys.path.append(str(Path(__file__).parent.parent))
+
+logging.basicConfig(level=logging.INFO)
 
 
 from src.init import redis_manager
@@ -29,9 +30,11 @@ async def lifespan(app: FastAPI):
     #  При старте приложения
     await redis_manager.connect()
     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
+    logging.info("FastAPI cache initialized")
     yield
     await redis_manager.close()
     #  При выключении\перезагрузке приложения
+
 
 if settings.MODE == "TEST":
     FastAPICache.init(RedisBackend(redis_manager.redis), prefix="fastapi-cache")
@@ -61,5 +64,5 @@ async def custom_swagger_ui_html():
     )
 
 
-if __name__ == '__main__':
-    uvicorn.run('main:app', reload=True)
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", reload=True)
