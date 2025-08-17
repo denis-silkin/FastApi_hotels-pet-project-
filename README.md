@@ -41,3 +41,8 @@ docker run --name booking_db \
     --network=myNetwork \
     --volume pg-booking-data:/var/lib/postgresql/data \
     -d postgres:16
+
+docker run --name booking_nginx `
+    --volume ./nginx.conf:/etc/nginx.conf `
+    --network=myNetwork `
+    --rm -p 80:80 nginx
